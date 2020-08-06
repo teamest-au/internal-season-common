@@ -6,9 +6,9 @@ jobs:
     steps:
       - checkout
       - run:
-        name: Run Build
-        command: |
-          npm run build
+          name: Run Build
+          command: |
+            npm run build
       - run:
           name: Run Unit Tests
           command: |
