@@ -4,6 +4,7 @@ import { EventGuards } from '@teamest/models/helpers';
 
 import * as google_protobuf_wrappers_pb from 'google-protobuf/google/protobuf/wrappers_pb';
 import * as G from '../grpc-types/season_pb';
+import { UpdateTeamSeasonResult } from './service_types';
 
 export function packageOptionalString(
   value?: string,
@@ -153,5 +154,29 @@ export function unpackageEvent(wrappedEvent: G.EventWrapper): Event {
     venue: unpackageOptionalString(wrappedEvent.getVenue()),
     ...unpackageMatchFields(wrappedEvent),
     ...unpackageDutyFields(wrappedEvent),
+  };
+}
+
+export function packageUpdateTeamSeasonResult(
+  rawUpdateTeamSeasonResult: UpdateTeamSeasonResult,
+): G.UpdateTeamSeasonResult {
+  const updateTeamSeasonResult = new G.UpdateTeamSeasonResult();
+  updateTeamSeasonResult.setSeasonName(rawUpdateTeamSeasonResult.seasonName);
+  updateTeamSeasonResult.setTeamName(rawUpdateTeamSeasonResult.teamName);
+  updateTeamSeasonResult.setTeamSeasonId(
+    rawUpdateTeamSeasonResult.teamSeasonId,
+  );
+  updateTeamSeasonResult.setWasModified(rawUpdateTeamSeasonResult.wasModified);
+  return updateTeamSeasonResult;
+}
+
+export function unpackageUpdateTeamSeasonResult(
+  updateTeamSeasonResult: G.UpdateTeamSeasonResult,
+): UpdateTeamSeasonResult {
+  return {
+    seasonName: updateTeamSeasonResult.getSeasonName(),
+    teamName: updateTeamSeasonResult.getTeamName(),
+    teamSeasonId: updateTeamSeasonResult.getTeamSeasonId(),
+    wasModified: updateTeamSeasonResult.getWasModified(),
   };
 }

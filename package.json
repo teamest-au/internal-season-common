@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/teamest-au/internal-season-api#readme",
   "devDependencies": {
+    "@danielemeryau/prettier-config": "0.0.6",
     "@types/google-protobuf": "^3.7.2",
     "@types/jest": "^26.0.5",
     "@types/node": "^14.0.24",

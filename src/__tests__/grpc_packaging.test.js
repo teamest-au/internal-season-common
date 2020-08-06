@@ -174,4 +174,24 @@ describe('grpc_packaging', () => {
       });
     });
   });
+  describe('updateTeamSeasonResult', () => {
+    it('it must correctly package and unpackage a team season result', async () => {
+      const updateTeamSeasonResultModel = {
+        seasonName: 'A test season',
+        teamName: 'A test team',
+        teamSeasonId: 'uuid for new identified or created team season',
+        wasModified: true,
+      };
+
+      const packaged = GrpcPackaging.packageUpdateTeamSeasonResult(
+        updateTeamSeasonResultModel,
+      );
+
+      expect(packaged).toBeInstanceOf(GrpcTypes.UpdateTeamSeasonResult);
+
+      const actual = GrpcPackaging.unpackageUpdateTeamSeasonResult(packaged);
+
+      expect(actual).toEqual(updateTeamSeasonResultModel);
+    });
+  });
 });
