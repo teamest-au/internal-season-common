@@ -15,3 +15,5 @@ npx grpc_tools_node_protoc\
 sed -i -- 's/import \* as grpc from "grpc";/import \* as grpc from "@grpc\/grpc-js";/g' grpc-types/*.d.ts
 
 npx tsc
+
+cp -r grpc-types dist
