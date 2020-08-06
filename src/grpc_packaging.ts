@@ -5,6 +5,7 @@ import { EventGuards } from '@teamest/models/helpers';
 import * as google_protobuf_wrappers_pb from 'google-protobuf/google/protobuf/wrappers_pb';
 import * as G from '../grpc-types/season_pb';
 import { UpdateTeamSeasonResult } from './service_types';
+import { TeamSeason } from '@teamest/models/processed/team_season';
 
 export function packageOptionalString(
   value?: string,
@@ -155,6 +156,28 @@ export function unpackageEvent(wrappedEvent: G.EventWrapper): Event {
     ...unpackageMatchFields(wrappedEvent),
     ...unpackageDutyFields(wrappedEvent),
   };
+}
+
+export function packageTeamSeason(rawTeamSeason: TeamSeason): G.TeamSeason {
+  const teamSeason = new G.TeamSeason();
+  teamSeason.setWrappedEventsList(rawTeamSeason.events.map(packageEvent));
+  teamSeason.setMatchDuration(rawTeamSeason.matchDuration);
+  teamSeason.setSeasonName(rawTeamSeason.seasonName);
+  teamSeason.setTeamName(rawTeamSeason.teamName);
+  teamSeason.setTimeScraped(packageTime(rawTeamSeason.timeScraped));
+  teamSeason.setTimezone(rawTeamSeason.timezone);
+  return teamSeason;
+}
+
+export function unpackageTeamSeason(teamSeason: G.TeamSeason): TeamSeason {
+  return {
+    events: teamSeason.getWrappedEventsList().map(unpackageEvent),
+    matchDuration: teamSeason.getMatchDuration(),
+    seasonName: teamSeason.getSeasonName(),
+    teamName: teamSeason.getTeamName(),
+    timeScraped: unpackageTime(teamSeason.getTimeScraped()),
+    timezone: teamSeason.getTimezone(),
+  }
 }
 
 export function packageUpdateTeamSeasonResult(

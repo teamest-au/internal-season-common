@@ -174,7 +174,66 @@ describe('grpc_packaging', () => {
       });
     });
   });
-  describe('updateTeamSeasonResult', () => {
+  describe('team season', () => {
+    it('it must correct package and unpackage a team season', async () => {
+      const teamSeasonModel = {
+        seasonName: 'A test season',
+        teamName: 'A test team',
+        timeScraped: new Date('2020-02-05T16:45:56'),
+        timezone: 'Australia/Adelaide',
+        matchDuration: 55,
+        events: [
+          {
+            type: 'match',
+            time: new Date('2020-01-01'),
+            court: 'Court 1',
+            venue: 'Large Venue',
+            home: {
+              name: 'Home Team',
+              isExternal: false,
+            },
+            away: {
+              name: 'Away Team',
+              isExternal: false,
+            },
+            duty: {
+              name: 'Duty Team',
+              isExternal: false,
+            },
+            round: 'Round 1',
+          },
+          {
+            type: 'duty',
+            time: new Date('2020-01-01'),
+            court: 'Court 1',
+            venue: 'Large Venue',
+            home: {
+              name: 'Home Team',
+              isExternal: false,
+            },
+            away: {
+              name: 'Away Team',
+              isExternal: false,
+            },
+            duty: {
+              name: 'Duty Team',
+              isExternal: false,
+            },
+            round: 'Round 1',
+          },
+        ],
+      };
+
+      const packaged = GrpcPackaging.packageTeamSeason(teamSeasonModel);
+
+      expect(packaged).toBeInstanceOf(GrpcTypes.TeamSeason);
+
+      const actual = GrpcPackaging.unpackageTeamSeason(packaged);
+
+      expect(actual).toEqual(teamSeasonModel);
+    });
+  });
+  describe('update team season result', () => {
     it('it must correctly package and unpackage a team season result', async () => {
       const updateTeamSeasonResultModel = {
         seasonName: 'A test season',
