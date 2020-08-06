@@ -6,13 +6,16 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Install Dependencies
+          command: |
+            npm ci
+      - run:
           name: Run Build
           command: |
             npm run build
       - run:
           name: Run Unit Tests
           command: |
-            npm ci
             npm t
       - persist_to_workspace:
           root: .
