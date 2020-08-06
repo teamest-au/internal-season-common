@@ -1,6 +1,6 @@
 {
   "name": "@teamest/internal-season-common",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Common types and tools shared between internal season grpc client and server",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
