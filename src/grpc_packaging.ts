@@ -127,16 +127,13 @@ function unpackageDutyFields(event: G.EventWrapper) {
 }
 
 export function packageEvent(event: Event): G.EventWrapper {
-  const rawMatch = EventGuards.eventAsMatch(event);
-  const rawDuty = EventGuards.eventAsDuty(event);
-
   let result;
-  if (rawDuty) {
-    result = packageDutyFields(rawDuty);
-  } else if (rawMatch) {
-    result = packageMatchFields(rawMatch);
+  if (EventGuards.isDuty(event)) {
+    result = packageDutyFields(event);
+  } else if (EventGuards.isMatch(event)) {
+    result = packageMatchFields(event);
   } else {
-    throw new Error();
+    throw new Error(`Recieved unknown event type ${event.type}`);
   }
 
   result.setType(packageEventType(event.type));
@@ -177,7 +174,7 @@ export function unpackageTeamSeason(teamSeason: G.TeamSeason): TeamSeason {
     teamName: teamSeason.getTeamName(),
     timeScraped: unpackageTime(teamSeason.getTimeScraped()),
     timezone: teamSeason.getTimezone(),
-  }
+  };
 }
 
 export function packageUpdateTeamSeasonResult(
