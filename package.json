@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "Common types and tools shared between internal season grpc client and server",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "build": "bash ./build.sh",
     "test": "npx jest"
