@@ -7,6 +7,26 @@ import * as G from '../grpc-types/season_pb';
 import { UpdateTeamSeasonResult } from './service_types';
 import { TeamSeason } from '@teamest/models/processed/team_season';
 
+export function packageOptionalInt32(
+  value?: number,
+): google_protobuf_wrappers_pb.Int32Value | undefined {
+  if (value) {
+    const result = new google_protobuf_wrappers_pb.Int32Value();
+    result.setValue(value);
+    return result;
+  }
+  return undefined;
+}
+
+export function unpackageOptionalInt32(
+  value: google_protobuf_wrappers_pb.Int32Value | undefined,
+): number | undefined {
+  if (value && value.getValue()) {
+    return value.getValue();
+  }
+  return undefined;
+}
+
 export function packageOptionalString(
   value?: string,
 ): google_protobuf_wrappers_pb.StringValue | undefined {
@@ -138,6 +158,8 @@ export function packageEvent(event: Event): G.EventWrapper {
 
   result.setType(packageEventType(event.type));
   result.setTime(packageTime(event.time));
+  result.setTimezone(packageOptionalString(event.timezone));
+  result.setDuration(packageOptionalInt32(event.duration));
   result.setCourt(packageOptionalString(event.court));
   result.setVenue(packageOptionalString(event.venue));
 
@@ -148,6 +170,8 @@ export function unpackageEvent(wrappedEvent: G.EventWrapper): Event {
   return {
     type: unpackageEventType(wrappedEvent.getType()),
     time: unpackageTime(wrappedEvent.getTime()),
+    timezone: unpackageOptionalString(wrappedEvent.getTimezone()),
+    duration: unpackageOptionalInt32(wrappedEvent.getDuration()),
     court: unpackageOptionalString(wrappedEvent.getCourt()),
     venue: unpackageOptionalString(wrappedEvent.getVenue()),
     ...unpackageMatchFields(wrappedEvent),
@@ -157,23 +181,23 @@ export function unpackageEvent(wrappedEvent: G.EventWrapper): Event {
 
 export function packageTeamSeason(rawTeamSeason: TeamSeason): G.TeamSeason {
   const teamSeason = new G.TeamSeason();
-  teamSeason.setWrappedEventsList(rawTeamSeason.events.map(packageEvent));
-  teamSeason.setMatchDuration(rawTeamSeason.matchDuration);
+  teamSeason.setCompetitionName(rawTeamSeason.competitionName);
   teamSeason.setSeasonName(rawTeamSeason.seasonName);
   teamSeason.setTeamName(rawTeamSeason.teamName);
-  teamSeason.setTimeScraped(packageTime(rawTeamSeason.timeScraped));
-  teamSeason.setTimezone(rawTeamSeason.timezone);
+  teamSeason.setWrappedEventsList(rawTeamSeason.events.map(packageEvent));
+  teamSeason.setLastScraped(packageTime(rawTeamSeason.lastScraped));
+  teamSeason.setLastChanged(packageTime(rawTeamSeason.lastChanged));
   return teamSeason;
 }
 
 export function unpackageTeamSeason(teamSeason: G.TeamSeason): TeamSeason {
   return {
-    events: teamSeason.getWrappedEventsList().map(unpackageEvent),
-    matchDuration: teamSeason.getMatchDuration(),
+    competitionName: teamSeason.getCompetitionName(),
     seasonName: teamSeason.getSeasonName(),
     teamName: teamSeason.getTeamName(),
-    timeScraped: unpackageTime(teamSeason.getTimeScraped()),
-    timezone: teamSeason.getTimezone(),
+    events: teamSeason.getWrappedEventsList().map(unpackageEvent),
+    lastScraped: unpackageTime(teamSeason.getLastScraped()),
+    lastChanged: unpackageTime(teamSeason.getLastChanged()),
   };
 }
 
@@ -181,6 +205,9 @@ export function packageUpdateTeamSeasonResult(
   rawUpdateTeamSeasonResult: UpdateTeamSeasonResult,
 ): G.UpdateTeamSeasonResult {
   const updateTeamSeasonResult = new G.UpdateTeamSeasonResult();
+  updateTeamSeasonResult.setCompetitionName(
+    rawUpdateTeamSeasonResult.competitionName,
+  );
   updateTeamSeasonResult.setSeasonName(rawUpdateTeamSeasonResult.seasonName);
   updateTeamSeasonResult.setTeamName(rawUpdateTeamSeasonResult.teamName);
   updateTeamSeasonResult.setTeamSeasonId(
@@ -194,6 +221,7 @@ export function unpackageUpdateTeamSeasonResult(
   updateTeamSeasonResult: G.UpdateTeamSeasonResult,
 ): UpdateTeamSeasonResult {
   return {
+    competitionName: updateTeamSeasonResult.getCompetitionName(),
     seasonName: updateTeamSeasonResult.getSeasonName(),
     teamName: updateTeamSeasonResult.getTeamName(),
     teamSeasonId: updateTeamSeasonResult.getTeamSeasonId(),

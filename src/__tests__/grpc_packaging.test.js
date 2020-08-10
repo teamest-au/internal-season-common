@@ -28,6 +28,30 @@ describe('grpc_packaging', () => {
       expect(actual).toEqual(value);
     });
   });
+  describe('optional int32', () => {
+    it('must correctly package and unpackage optional int32 (with value)', async () => {
+      const value = 25;
+
+      const packaged = GrpcPackaging.packageOptionalInt32(value);
+
+      expect(packaged).toBeInstanceOf(google_protobuf_wrappers_pb.Int32Value);
+
+      const actual = GrpcPackaging.unpackageOptionalInt32(packaged);
+
+      expect(actual).toEqual(value);
+    });
+    it('must correctly package and unpackage optional int32 (without value)', async () => {
+      const value = undefined;
+
+      const packaged = GrpcPackaging.packageOptionalInt32(value);
+
+      expect(packaged).toBe(undefined);
+
+      const actual = GrpcPackaging.unpackageOptionalInt32(packaged);
+
+      expect(actual).toEqual(value);
+    });
+  });
   describe('time', () => {
     it('must correctly package and unpackage time', async () => {
       const time = new Date('2020-02-05T16:45:56');
@@ -76,6 +100,8 @@ describe('grpc_packaging', () => {
         const matchModel = {
           type: 'match',
           time: new Date('2020-01-01'),
+          timezone: 'Australia/Adelaide',
+          duration: 45,
           court: 'Court 1',
           venue: 'Large Venue',
           home: {
@@ -129,6 +155,8 @@ describe('grpc_packaging', () => {
         const dutyModel = {
           type: 'duty',
           time: new Date('2020-01-01'),
+          timezone: 'Australia/Adelaide',
+          duration: 35,
           court: 'Court 1',
           venue: 'Large Venue',
           home: {
@@ -177,11 +205,11 @@ describe('grpc_packaging', () => {
   describe('team season', () => {
     it('it must correct package and unpackage a team season', async () => {
       const teamSeasonModel = {
+        competitionName: 'Some competition',
         seasonName: 'A test season',
         teamName: 'A test team',
-        timeScraped: new Date('2020-02-05T16:45:56'),
-        timezone: 'Australia/Adelaide',
-        matchDuration: 55,
+        lastScraped: new Date('2020-02-05T16:45:56'),
+        lastChanged: new Date('2020-02-05T16:45:56'),
         events: [
           {
             type: 'match',
@@ -236,6 +264,7 @@ describe('grpc_packaging', () => {
   describe('update team season result', () => {
     it('it must correctly package and unpackage a team season result', async () => {
       const updateTeamSeasonResultModel = {
+        competitionName: 'Some competition name',
         seasonName: 'A test season',
         teamName: 'A test team',
         teamSeasonId: 'uuid for new identified or created team season',

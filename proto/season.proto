@@ -34,30 +34,33 @@ message Duty {
 message EventWrapper {
   EventType type = 1;
   string time = 2;
-  google.protobuf.StringValue court = 3;
-  google.protobuf.StringValue venue = 4;
+  google.protobuf.StringValue timezone = 3;
+  google.protobuf.Int32Value duration = 4;
+  google.protobuf.StringValue court = 5;
+  google.protobuf.StringValue venue = 6;
   oneof sub_event {
-    Match match = 5;
-    Duty duty = 6;
+    Match match = 7;
+    Duty duty = 8;
   }
 }
 
 /** Based on SerialisedTeamSeason @teamest/models/processed */
 message TeamSeason {
-  string season_name = 1;
-  string team_name = 2;
-  repeated EventWrapper wrapped_events = 3;
-  string time_scraped = 4;
-  string timezone = 5;
-  int32 match_duration = 6;
+  string competition_name = 1;
+  string season_name = 2;
+  string team_name = 3;
+  repeated EventWrapper wrapped_events = 4;
+  string last_scraped = 5;
+  string last_changed = 6;
 }
 
 /** Based on UpdateTeamSeasonResult /src/service_types.ts */
 message UpdateTeamSeasonResult {
-  string season_name = 1;
-  string team_name = 2;
-  string team_season_id = 3;
-  bool was_modified = 4;
+  string competition_name = 1;
+  string season_name = 2;
+  string team_name = 3;
+  string team_season_id = 4;
+  bool was_modified = 5;
 }
 
 service Season {
