@@ -1,59 +1,12 @@
+import * as G from '../../grpc-types/season_pb';
+
 import { Event, Team, Match, Duty } from '@teamest/models/raw';
 import { EventType } from '@teamest/models/raw/event';
 import { EventGuards } from '@teamest/models/helpers';
-
-import * as google_protobuf_wrappers_pb from 'google-protobuf/google/protobuf/wrappers_pb';
-import * as G from '../grpc-types/season_pb';
-import { UpdateTeamSeasonResult } from './service_types';
 import { TeamSeason } from '@teamest/models/processed/team_season';
 
-export function packageOptionalInt32(
-  value?: number,
-): google_protobuf_wrappers_pb.Int32Value | undefined {
-  if (value) {
-    const result = new google_protobuf_wrappers_pb.Int32Value();
-    result.setValue(value);
-    return result;
-  }
-  return undefined;
-}
-
-export function unpackageOptionalInt32(
-  value: google_protobuf_wrappers_pb.Int32Value | undefined,
-): number | undefined {
-  if (value && value.getValue()) {
-    return value.getValue();
-  }
-  return undefined;
-}
-
-export function packageOptionalString(
-  value?: string,
-): google_protobuf_wrappers_pb.StringValue | undefined {
-  if (value) {
-    const result = new google_protobuf_wrappers_pb.StringValue();
-    result.setValue(value);
-    return result;
-  }
-  return undefined;
-}
-
-export function unpackageOptionalString(
-  value: google_protobuf_wrappers_pb.StringValue | undefined,
-): string | undefined {
-  if (value && value.getValue()) {
-    return value.getValue();
-  }
-  return undefined;
-}
-
-export function packageTime(time: Date): string {
-  return time.toISOString();
-}
-
-export function unpackageTime(time: string): Date {
-  return new Date(time);
-}
+import * as PackagingHelpers from './packaging_helpers';
+import { SavedTeamSeason } from '@teamest/models/processed';
 
 export function packageTeam(team: Team | undefined): G.Team | undefined {
   if (team) {
@@ -102,7 +55,7 @@ function packageMatchFields(rawMatch: Match): G.EventWrapper {
   match.setHome(packageTeam(rawMatch.home));
   match.setAway(packageTeam(rawMatch.away));
   if (rawMatch.duty) match.setDuty(packageTeam(rawMatch.duty));
-  match.setRound(packageOptionalString(rawMatch.round));
+  match.setRound(PackagingHelpers.packageOptionalString(rawMatch.round));
   result.setDuty(match);
   return result;
 }
@@ -114,7 +67,7 @@ function unpackageMatchFields(event: G.EventWrapper) {
       home: unpackageTeam(match.getHome()),
       away: unpackageTeam(match.getAway()),
       duty: unpackageTeam(match.getDuty()),
-      round: unpackageOptionalString(match.getRound()),
+      round: PackagingHelpers.unpackageOptionalString(match.getRound()),
     };
   } else {
     return false;
@@ -127,7 +80,7 @@ function packageDutyFields(rawDuty: Duty): G.EventWrapper {
   if (rawDuty.home) duty.setHome(packageTeam(rawDuty.home));
   if (rawDuty.away) duty.setAway(packageTeam(rawDuty.away));
   duty.setDuty(packageTeam(rawDuty.duty));
-  if (rawDuty.round) duty.setRound(packageOptionalString(rawDuty.round));
+  if (rawDuty.round) duty.setRound(PackagingHelpers.packageOptionalString(rawDuty.round));
   result.setDuty(duty);
   return result;
 }
@@ -139,7 +92,7 @@ function unpackageDutyFields(event: G.EventWrapper) {
       home: unpackageTeam(duty.getHome()),
       away: unpackageTeam(duty.getAway()),
       duty: unpackageTeam(duty.getDuty()),
-      round: unpackageOptionalString(duty.getRound()),
+      round: PackagingHelpers.unpackageOptionalString(duty.getRound()),
     };
   } else {
     return false;
@@ -157,11 +110,11 @@ export function packageEvent(event: Event): G.EventWrapper {
   }
 
   result.setType(packageEventType(event.type));
-  result.setTime(packageTime(event.time));
-  result.setTimezone(packageOptionalString(event.timezone));
-  result.setDuration(packageOptionalInt32(event.duration));
-  result.setCourt(packageOptionalString(event.court));
-  result.setVenue(packageOptionalString(event.venue));
+  result.setTime(PackagingHelpers.packageTime(event.time));
+  result.setTimezone(PackagingHelpers.packageOptionalString(event.timezone));
+  result.setDuration(PackagingHelpers.packageOptionalInt32(event.duration));
+  result.setCourt(PackagingHelpers.packageOptionalString(event.court));
+  result.setVenue(PackagingHelpers.packageOptionalString(event.venue));
 
   return result;
 }
@@ -169,11 +122,11 @@ export function packageEvent(event: Event): G.EventWrapper {
 export function unpackageEvent(wrappedEvent: G.EventWrapper): Event {
   return {
     type: unpackageEventType(wrappedEvent.getType()),
-    time: unpackageTime(wrappedEvent.getTime()),
-    timezone: unpackageOptionalString(wrappedEvent.getTimezone()),
-    duration: unpackageOptionalInt32(wrappedEvent.getDuration()),
-    court: unpackageOptionalString(wrappedEvent.getCourt()),
-    venue: unpackageOptionalString(wrappedEvent.getVenue()),
+    time: PackagingHelpers.unpackageTime(wrappedEvent.getTime()),
+    timezone: PackagingHelpers.unpackageOptionalString(wrappedEvent.getTimezone()),
+    duration: PackagingHelpers.unpackageOptionalInt32(wrappedEvent.getDuration()),
+    court: PackagingHelpers.unpackageOptionalString(wrappedEvent.getCourt()),
+    venue: PackagingHelpers.unpackageOptionalString(wrappedEvent.getVenue()),
     ...unpackageMatchFields(wrappedEvent),
     ...unpackageDutyFields(wrappedEvent),
   };
@@ -185,8 +138,7 @@ export function packageTeamSeason(rawTeamSeason: TeamSeason): G.TeamSeason {
   teamSeason.setSeasonName(rawTeamSeason.seasonName);
   teamSeason.setTeamName(rawTeamSeason.teamName);
   teamSeason.setWrappedEventsList(rawTeamSeason.events.map(packageEvent));
-  teamSeason.setLastScraped(packageTime(rawTeamSeason.lastScraped));
-  teamSeason.setLastChanged(packageTime(rawTeamSeason.lastChanged));
+  teamSeason.setLastScraped(PackagingHelpers.packageTime(rawTeamSeason.lastScraped));
   return teamSeason;
 }
 
@@ -196,35 +148,28 @@ export function unpackageTeamSeason(teamSeason: G.TeamSeason): TeamSeason {
     seasonName: teamSeason.getSeasonName(),
     teamName: teamSeason.getTeamName(),
     events: teamSeason.getWrappedEventsList().map(unpackageEvent),
-    lastScraped: unpackageTime(teamSeason.getLastScraped()),
-    lastChanged: unpackageTime(teamSeason.getLastChanged()),
+    lastScraped: PackagingHelpers.unpackageTime(teamSeason.getLastScraped()),
   };
 }
 
-export function packageUpdateTeamSeasonResult(
-  rawUpdateTeamSeasonResult: UpdateTeamSeasonResult,
-): G.UpdateTeamSeasonResult {
-  const updateTeamSeasonResult = new G.UpdateTeamSeasonResult();
-  updateTeamSeasonResult.setCompetitionName(
-    rawUpdateTeamSeasonResult.competitionName,
-  );
-  updateTeamSeasonResult.setSeasonName(rawUpdateTeamSeasonResult.seasonName);
-  updateTeamSeasonResult.setTeamName(rawUpdateTeamSeasonResult.teamName);
-  updateTeamSeasonResult.setTeamSeasonId(
-    rawUpdateTeamSeasonResult.teamSeasonId,
-  );
-  updateTeamSeasonResult.setWasModified(rawUpdateTeamSeasonResult.wasModified);
-  return updateTeamSeasonResult;
+export function packageSavedTeamSeason(rawTeamSeason: SavedTeamSeason): G.SavedTeamSeason {
+  const teamSeason = new G.SavedTeamSeason();
+  teamSeason.setCompetitionName(rawTeamSeason.competitionName);
+  teamSeason.setSeasonName(rawTeamSeason.seasonName);
+  teamSeason.setTeamName(rawTeamSeason.teamName);
+  teamSeason.setWrappedEventsList(rawTeamSeason.events.map(packageEvent));
+  teamSeason.setLastScraped(PackagingHelpers.packageTime(rawTeamSeason.lastScraped));
+  teamSeason.setLastChanged(PackagingHelpers.packageTime(rawTeamSeason.lastChanged));
+  return teamSeason;
 }
 
-export function unpackageUpdateTeamSeasonResult(
-  updateTeamSeasonResult: G.UpdateTeamSeasonResult,
-): UpdateTeamSeasonResult {
+export function unpackageSavedTeamSeason(teamSeason: G.SavedTeamSeason): SavedTeamSeason {
   return {
-    competitionName: updateTeamSeasonResult.getCompetitionName(),
-    seasonName: updateTeamSeasonResult.getSeasonName(),
-    teamName: updateTeamSeasonResult.getTeamName(),
-    teamSeasonId: updateTeamSeasonResult.getTeamSeasonId(),
-    wasModified: updateTeamSeasonResult.getWasModified(),
+    competitionName: teamSeason.getCompetitionName(),
+    seasonName: teamSeason.getSeasonName(),
+    teamName: teamSeason.getTeamName(),
+    events: teamSeason.getWrappedEventsList().map(unpackageEvent),
+    lastScraped: PackagingHelpers.unpackageTime(teamSeason.getLastScraped()),
+    lastChanged: PackagingHelpers.unpackageTime(teamSeason.getLastChanged()),
   };
 }

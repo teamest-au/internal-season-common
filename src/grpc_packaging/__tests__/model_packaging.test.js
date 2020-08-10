@@ -1,70 +1,7 @@
-const google_protobuf_wrappers_pb = require('google-protobuf/google/protobuf/wrappers_pb');
+const GrpcTypes = require('../../../grpc-types/season_pb');
+const ModelPackaging = require('../model_packaging');
 
-const GrpcPackaging = require('../grpc_packaging');
-const GrpcTypes = require('../../grpc-types/season_pb');
-
-describe('grpc_packaging', () => {
-  describe('optional string', () => {
-    it('must correctly package and unpackage optional string (with value)', async () => {
-      const value = 'test';
-
-      const packaged = GrpcPackaging.packageOptionalString(value);
-
-      expect(packaged).toBeInstanceOf(google_protobuf_wrappers_pb.StringValue);
-
-      const actual = GrpcPackaging.unpackageOptionalString(packaged);
-
-      expect(actual).toEqual(value);
-    });
-    it('must correctly package and unpackage optional string (without value)', async () => {
-      const value = undefined;
-
-      const packaged = GrpcPackaging.packageOptionalString(value);
-
-      expect(packaged).toBe(undefined);
-
-      const actual = GrpcPackaging.unpackageOptionalString(packaged);
-
-      expect(actual).toEqual(value);
-    });
-  });
-  describe('optional int32', () => {
-    it('must correctly package and unpackage optional int32 (with value)', async () => {
-      const value = 25;
-
-      const packaged = GrpcPackaging.packageOptionalInt32(value);
-
-      expect(packaged).toBeInstanceOf(google_protobuf_wrappers_pb.Int32Value);
-
-      const actual = GrpcPackaging.unpackageOptionalInt32(packaged);
-
-      expect(actual).toEqual(value);
-    });
-    it('must correctly package and unpackage optional int32 (without value)', async () => {
-      const value = undefined;
-
-      const packaged = GrpcPackaging.packageOptionalInt32(value);
-
-      expect(packaged).toBe(undefined);
-
-      const actual = GrpcPackaging.unpackageOptionalInt32(packaged);
-
-      expect(actual).toEqual(value);
-    });
-  });
-  describe('time', () => {
-    it('must correctly package and unpackage time', async () => {
-      const time = new Date('2020-02-05T16:45:56');
-
-      const packaged = GrpcPackaging.packageTime(time);
-
-      expect(typeof packaged).toBe('string');
-
-      const actual = GrpcPackaging.unpackageTime(packaged);
-
-      expect(actual).toEqual(time);
-    });
-  });
+describe('model packaging', () => {
   describe('team', () => {
     it('must correctly package and unpackage team model', async () => {
       const teamModel = {
@@ -72,11 +9,11 @@ describe('grpc_packaging', () => {
         isExternal: true,
       };
 
-      const packaged = GrpcPackaging.packageTeam(teamModel);
+      const packaged = ModelPackaging.packageTeam(teamModel);
 
       expect(packaged).toBeInstanceOf(GrpcTypes.Team);
 
-      const actual = GrpcPackaging.unpackageTeam(packaged);
+      const actual = ModelPackaging.unpackageTeam(packaged);
 
       expect(actual).toEqual(teamModel);
     });
@@ -85,11 +22,11 @@ describe('grpc_packaging', () => {
     it('must correctly package and unpackage event type', async () => {
       const eventType = 'duty';
 
-      const packaged = GrpcPackaging.packageEventType(eventType);
+      const packaged = ModelPackaging.packageEventType(eventType);
 
       expect(typeof packaged).toBe('number');
 
-      const actual = GrpcPackaging.unpackageEventType(packaged);
+      const actual = ModelPackaging.unpackageEventType(packaged);
 
       expect(actual).toEqual(eventType);
     });
@@ -119,11 +56,11 @@ describe('grpc_packaging', () => {
           round: 'Round 1',
         };
 
-        const packaged = GrpcPackaging.packageEvent(matchModel);
+        const packaged = ModelPackaging.packageEvent(matchModel);
 
         expect(packaged).toBeInstanceOf(GrpcTypes.EventWrapper);
 
-        const actual = GrpcPackaging.unpackageEvent(packaged);
+        const actual = ModelPackaging.unpackageEvent(packaged);
 
         expect(actual).toEqual(matchModel);
       });
@@ -141,11 +78,11 @@ describe('grpc_packaging', () => {
           },
         };
 
-        const packaged = GrpcPackaging.packageEvent(matchModel);
+        const packaged = ModelPackaging.packageEvent(matchModel);
 
         expect(packaged).toBeInstanceOf(GrpcTypes.EventWrapper);
 
-        const actual = GrpcPackaging.unpackageEvent(packaged);
+        const actual = ModelPackaging.unpackageEvent(packaged);
 
         expect(actual).toEqual(matchModel);
       });
@@ -174,11 +111,11 @@ describe('grpc_packaging', () => {
           round: 'Round 1',
         };
 
-        const packaged = GrpcPackaging.packageEvent(dutyModel);
+        const packaged = ModelPackaging.packageEvent(dutyModel);
 
         expect(packaged).toBeInstanceOf(GrpcTypes.EventWrapper);
 
-        const actual = GrpcPackaging.unpackageEvent(packaged);
+        const actual = ModelPackaging.unpackageEvent(packaged);
 
         expect(actual).toEqual(dutyModel);
       });
@@ -192,11 +129,11 @@ describe('grpc_packaging', () => {
           },
         };
 
-        const packaged = GrpcPackaging.packageEvent(dutyModel);
+        const packaged = ModelPackaging.packageEvent(dutyModel);
 
         expect(packaged).toBeInstanceOf(GrpcTypes.EventWrapper);
 
-        const actual = GrpcPackaging.unpackageEvent(packaged);
+        const actual = ModelPackaging.unpackageEvent(packaged);
 
         expect(actual).toEqual(dutyModel);
       });
@@ -205,6 +142,64 @@ describe('grpc_packaging', () => {
   describe('team season', () => {
     it('it must correct package and unpackage a team season', async () => {
       const teamSeasonModel = {
+        competitionName: 'Some competition',
+        seasonName: 'A test season',
+        teamName: 'A test team',
+        lastScraped: new Date('2020-02-05T16:45:56'),
+        events: [
+          {
+            type: 'match',
+            time: new Date('2020-01-01'),
+            court: 'Court 1',
+            venue: 'Large Venue',
+            home: {
+              name: 'Home Team',
+              isExternal: false,
+            },
+            away: {
+              name: 'Away Team',
+              isExternal: false,
+            },
+            duty: {
+              name: 'Duty Team',
+              isExternal: false,
+            },
+            round: 'Round 1',
+          },
+          {
+            type: 'duty',
+            time: new Date('2020-01-01'),
+            court: 'Court 1',
+            venue: 'Large Venue',
+            home: {
+              name: 'Home Team',
+              isExternal: false,
+            },
+            away: {
+              name: 'Away Team',
+              isExternal: false,
+            },
+            duty: {
+              name: 'Duty Team',
+              isExternal: false,
+            },
+            round: 'Round 1',
+          },
+        ],
+      };
+
+      const packaged = ModelPackaging.packageTeamSeason(teamSeasonModel);
+
+      expect(packaged).toBeInstanceOf(GrpcTypes.TeamSeason);
+
+      const actual = ModelPackaging.unpackageTeamSeason(packaged);
+
+      expect(actual).toEqual(teamSeasonModel);
+    });
+  });
+  describe('team season', () => {
+    it('it must correct package and unpackage a saved team season', async () => {
+      const savedTeamSeasonModel = {
         competitionName: 'Some competition',
         seasonName: 'A test season',
         teamName: 'A test team',
@@ -252,34 +247,13 @@ describe('grpc_packaging', () => {
         ],
       };
 
-      const packaged = GrpcPackaging.packageTeamSeason(teamSeasonModel);
+      const packaged = ModelPackaging.packageSavedTeamSeason(savedTeamSeasonModel);
 
-      expect(packaged).toBeInstanceOf(GrpcTypes.TeamSeason);
+      expect(packaged).toBeInstanceOf(GrpcTypes.SavedTeamSeason);
 
-      const actual = GrpcPackaging.unpackageTeamSeason(packaged);
+      const actual = ModelPackaging.unpackageSavedTeamSeason(packaged);
 
-      expect(actual).toEqual(teamSeasonModel);
-    });
-  });
-  describe('update team season result', () => {
-    it('it must correctly package and unpackage a team season result', async () => {
-      const updateTeamSeasonResultModel = {
-        competitionName: 'Some competition name',
-        seasonName: 'A test season',
-        teamName: 'A test team',
-        teamSeasonId: 'uuid for new identified or created team season',
-        wasModified: true,
-      };
-
-      const packaged = GrpcPackaging.packageUpdateTeamSeasonResult(
-        updateTeamSeasonResultModel,
-      );
-
-      expect(packaged).toBeInstanceOf(GrpcTypes.UpdateTeamSeasonResult);
-
-      const actual = GrpcPackaging.unpackageUpdateTeamSeasonResult(packaged);
-
-      expect(actual).toEqual(updateTeamSeasonResultModel);
+      expect(actual).toEqual(savedTeamSeasonModel);
     });
   });
 });

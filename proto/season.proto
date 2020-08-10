@@ -30,7 +30,7 @@ message Duty {
   google.protobuf.StringValue round = 4;
 }
 
-/** Based on SerialisedEvent @teamest/models/raw */
+/** Based on Event @teamest/models/raw */
 message EventWrapper {
   EventType type = 1;
   string time = 2;
@@ -44,8 +44,17 @@ message EventWrapper {
   }
 }
 
-/** Based on SerialisedTeamSeason @teamest/models/processed */
+/** Based on TeamSeason @teamest/models/processed */
 message TeamSeason {
+  string competition_name = 1;
+  string season_name = 2;
+  string team_name = 3;
+  repeated EventWrapper wrapped_events = 4;
+  string last_scraped = 5;
+}
+
+/** Based on SavedTeamSeason @teamest/models/processed */
+message SavedTeamSeason {
   string competition_name = 1;
   string season_name = 2;
   string team_name = 3;
@@ -54,8 +63,13 @@ message TeamSeason {
   string last_changed = 6;
 }
 
-/** Based on UpdateTeamSeasonResult /src/service_types.ts */
-message UpdateTeamSeasonResult {
+/** Based on UpdateTeamSeasonRequest /src/service_types.ts */
+message UpdateTeamSeasonRequest {
+  TeamSeason team_season = 1;
+}
+
+/** Based on UpdateTeamSeasonResponse /src/service_types.ts */
+message UpdateTeamSeasonResponse {
   string competition_name = 1;
   string season_name = 2;
   string team_name = 3;
@@ -63,6 +77,25 @@ message UpdateTeamSeasonResult {
   bool was_modified = 5;
 }
 
+/** Based on TeamSpecifier /src/service_types.ts */
+message TeamSpecifier {
+  string competition_name = 1;
+  string season_name = 2;
+  string team_name = 3;
+}
+
+/** Based on GetSeasonsForTeamRequest /src/service_types.ts */
+message GetSeasonsForTeamRequest {
+  repeated TeamSpecifier team_specifiers = 1;
+  google.protobuf.StringValue updated_since = 2;
+}
+
+/** Based on GetSeasonsForTeamResponse /src/service_types.ts */
+message GetSeasonsForTeamResponse {
+  repeated SavedTeamSeason matching_team_seasons = 1;
+}
+
 service Season {
-  rpc UpdateTeamSeason (TeamSeason) returns (UpdateTeamSeasonResult);
+  rpc UpdateTeamSeason (UpdateTeamSeasonRequest) returns (UpdateTeamSeasonResponse);
+  rpc GetSeasonsForTeam (GetSeasonsForTeamRequest) returns (GetSeasonsForTeamResponse);
 }
